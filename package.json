@@ -6,6 +6,24 @@
   "type": "module",
   "main": "dist/thai-keyboard-corrector.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chayuto/thai-keyboard-corrector-ts.git"
+  },
+  "homepage": "https://github.com/chayuto/thai-keyboard-corrector-ts#readme",
+  "bugs": {
+    "url": "https://github.com/chayuto/thai-keyboard-corrector-ts/issues"
+  },
+  "keywords": [
+    "thai",
+    "keyboard",
+    "layout",
+    "corrector",
+    "kedmanee",
+    "qwerty",
+    "typing",
+    "text-processing"
+  ],
   "scripts": {
     "build": "tsc && esbuild src/index.ts --bundle --format=iife --global-name=ThaiKeyboardCorrector --outfile=dist/thai-keyboard-corrector.js",
     "test": "vitest"

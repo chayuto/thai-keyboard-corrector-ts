@@ -83,7 +83,7 @@ var ThaiKeyboardCorrector = (() => {
     "\u0E24": "A",
     "\u0E26": "S",
     "\u0E0C": "H",
-    "\u0E28": "L",
+    "\u0E28": "l",
     "\u0E29": ";",
     "\u0E2E": "'",
     "\u0E12": "Z",
