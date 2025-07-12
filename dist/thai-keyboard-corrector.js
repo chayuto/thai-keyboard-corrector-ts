@@ -22,7 +22,6 @@ var ThaiKeyboardCorrector = (() => {
   var src_exports = {};
   __export(src_exports, {
     correct: () => correct,
-    detectLayout: () => detectLayout,
     mapEngToThai: () => mapEngToThai,
     mapThaiToEng: () => mapThaiToEng
   });
@@ -72,24 +71,24 @@ var ThaiKeyboardCorrector = (() => {
     "\u0E58": "8",
     "\u0E59": "9",
     "\u0E50": "0",
-    "\u0E03": "w",
-    "\u0E05": "e",
-    "\u0E06": "r",
-    "\u0E11": "t",
-    "\u0E4D": "y",
-    "\u0E10": "u",
-    "\u0E13": "i",
-    "\u0E0D": "o",
-    "\u0E18": "t",
-    "\u0E24": "a",
-    "\u0E26": "s",
-    "\u0E0C": "h",
-    "\u0E28": "l",
+    "\u0E03": "W",
+    "\u0E05": "E",
+    "\u0E06": "R",
+    "\u0E11": "T",
+    "\u0E4D": "Y",
+    "\u0E10": "U",
+    "\u0E13": "I",
+    "\u0E0D": "O",
+    "\u0E18": "T",
+    "\u0E24": "A",
+    "\u0E26": "S",
+    "\u0E0C": "H",
+    "\u0E28": "L",
     "\u0E29": ";",
     "\u0E2E": "'",
-    "\u0E12": "z",
-    "\u0E2C": "x",
-    "\u0E2F": "m",
+    "\u0E12": "Z",
+    "\u0E2C": "X",
+    "\u0E2F": "M",
     "\u0E3F": ".",
     "\u0E4F": "/",
     "\u0E5B": ","
@@ -112,28 +111,19 @@ var ThaiKeyboardCorrector = (() => {
   var mapThaiToEng = (txt) => Array.from(txt).map((c) => THAI_TO_ENG[c] ?? c).join("");
   var isThai = (c) => c.charCodeAt(0) >= 3584 && c.charCodeAt(0) <= 3711;
   var isLatin = (c) => /[A-Za-z]/.test(c);
-  function detectLayout(txt) {
-    const raw = txt.trim().replace(/\s+/g, "");
-    if (!raw) return "unknown";
-    let th = 0, en = 0;
-    for (const ch of raw) {
-      if (isThai(ch)) th++;
-      else if (isLatin(ch)) en++;
-    }
-    if (th > en) return "en_in_th";
-    if (en > th) return "thai_in_en";
-    if (th === 0 && en === 0) return "unknown";
-    return "mixed";
-  }
   function correct(txt) {
-    switch (detectLayout(txt)) {
-      case "thai_in_en":
-        return mapEngToThai(txt);
-      case "en_in_th":
-        return mapThaiToEng(txt);
-      default:
-        return txt;
+    let latin = 0, thai = 0;
+    for (const c of txt) {
+      if (isLatin(c)) latin++;
+      else if (isThai(c)) thai++;
     }
+    const total = latin + thai;
+    if (total === 0) return txt;
+    const latinRatio = latin / total;
+    const thaiRatio = thai / total;
+    if (latinRatio >= 0.7) return mapEngToThai(txt);
+    if (thaiRatio >= 0.7) return mapThaiToEng(txt);
+    return txt;
   }
   return __toCommonJS(src_exports);
 })();

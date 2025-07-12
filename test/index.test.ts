@@ -36,7 +36,7 @@ describe('Thai-Keyboard-Corrector', () => {
 
     it('handles shift characters', () => {
       expect(mapThaiToEng('๑๒๓๔๕')).toBe('12345');
-      expect(mapThaiToEng('ฃฅฆฑ')).toBe('wert');
+      expect(mapThaiToEng('ฃฅฆฑ')).toBe('WERT');
     });
   });
 
