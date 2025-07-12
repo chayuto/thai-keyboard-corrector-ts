@@ -40,6 +40,8 @@ console.log(correct("สวัสดี hello")); // สวัสดี hello (u
 | `mapThaiToEng(str)` | Raw TH→EN character map  | `mapThaiToEng("ฟหกด")` → `"asdf"` |
 | `correct(str)`      | Smart auto-correction    | `correct("l;ylfu")` → `"สวัสดี"` |
 
+**Note**: `mapThaiToEng()` handles both base and shift layers, mapping Thai shifted characters to uppercase English.
+
 ## How It Works
 
 The `correct()` function uses a 70% threshold to determine layout:
@@ -47,6 +49,15 @@ The `correct()` function uses a 70% threshold to determine layout:
 - **≥70% Latin characters** → Maps entire string to Thai
 - **≥70% Thai characters** → Maps entire string to English  
 - **<70% of either script** → Leaves unchanged (unclear ratio)
+
+### Keyboard Mapping
+
+The library maps characters based on the Thai Kedmanee keyboard layout:
+
+- **Base layer**: English QWERTY → Thai characters (e.g., `q` → `ๆ`, `w` → `ไ`)
+- **Shift layer**: Thai shifted characters → Uppercase English (e.g., `ฃ` → `W`, `ฅ` → `E`)
+- **Numbers**: Thai numerals → Arabic numerals (e.g., `๑` → `1`, `๒` → `2`)
+- **Symbols**: Preserved as-is
 
 ## Examples & Test Cases
 
@@ -67,6 +78,7 @@ correct("สวัสดี")        // l;ylfu
 correct("ประเทศไทย")      // xitgmlwmp
 correct("ครับ")          // คiy[
 correct("๑๒๓๔๕")         // 12345
+correct("ฃฅฆฑ")          // WERT (shifted characters)
 ```
 
 ### Unclear Cases (Left Unchanged)
