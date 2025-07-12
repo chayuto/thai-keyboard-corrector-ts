@@ -1,12 +1,5 @@
 // Thai Keyboard Corrector – TypeScript
 // When bundling for browser, global is now ThaiKeyboardCorrector
-export type Layout =
-  | 'thai_in_en'
-  | 'en_in_th'
-  | 'thai'
-  | 'en'
-  | 'mixed'
-  | 'unknown';
 
 // ── EN (QWERTY) → TH (Kedmanee) base layer
 const BASE: Record<string, string> = {
@@ -19,7 +12,6 @@ const BASE: Record<string, string> = {
   n: 'ื', m: 'ท', ',': 'ม', '.': 'ใ', '/': 'ฝ'
 } as const;
 
-// ── TH shift glyphs → EN keys
 const SHIFT: Record<string, string> = {
   '๑': '1', '๒': '2', '๓': '3', '๔': '4', '๕': '5',
   '๖': '6', '๗': '7', '๘': '8', '๙': '9', '๐': '0',
@@ -29,7 +21,6 @@ const SHIFT: Record<string, string> = {
   'ฒ': 'z', 'ฬ': 'x', 'ฯ': 'm', '฿': '.', '๏': '/', '๛': ','
 } as const;
 
-// ── Build full maps
 const ENG_TO_THAI: Record<string, string> = (() => {
   const m: Record<string, string> = {};
   for (const [en, th] of Object.entries(BASE)) {
@@ -46,38 +37,29 @@ const THAI_TO_ENG: Record<string, string> = (() => {
   return m;
 })();
 
-// ── Converters
 export const mapEngToThai = (txt: string) =>
   Array.from(txt).map(c => ENG_TO_THAI[c] ?? c).join('');
 
 export const mapThaiToEng = (txt: string) =>
   Array.from(txt).map(c => THAI_TO_ENG[c] ?? c).join('');
 
-// ── Layout detection (very lightweight heuristic)
+// Always swap: if a character is Latin, map to Thai; if Thai, map to English; else leave as-is
 const isThai = (c: string) => c.charCodeAt(0) >= 0x0e00 && c.charCodeAt(0) <= 0x0e7f;
 const isLatin = (c: string) => /[A-Za-z]/.test(c);
 
-export function detectLayout(txt: string): Layout {
-  const raw = txt.trim().replace(/\s+/g, '');
-  if (!raw) return 'unknown';
-
-  let th = 0, en = 0;
-  for (const ch of raw) {
-    if (isThai(ch)) th++;
-    else if (isLatin(ch)) en++;
-  }
-
-  if (th > en) return 'en_in_th';
-  if (en > th) return 'thai_in_en';
-  if (th === 0 && en === 0) return 'unknown';
-  return 'mixed';
-}
-
-// ── Public helper that auto-corrects when layout seems swapped
 export function correct(txt: string): string {
-  switch (detectLayout(txt)) {
-    case 'thai_in_en': return mapEngToThai(txt);
-    case 'en_in_th'  : return mapThaiToEng(txt);
-    default          : return txt;
+  let latin = 0, thai = 0;
+  for (const c of txt) {
+    if (isLatin(c)) latin++;
+    else if (isThai(c)) thai++;
   }
+  const total = latin + thai;
+  if (total === 0) return txt;
+  
+  const latinRatio = latin / total;
+  const thaiRatio = thai / total;
+  
+  if (latinRatio >= 0.7) return mapEngToThai(txt);
+  if (thaiRatio >= 0.7) return mapThaiToEng(txt);
+  return txt; // unclear ratio, don't do anything
 }
